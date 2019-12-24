@@ -1,0 +1,72 @@
+API_URL = """from django.conf.urls import include, url
+try:
+  from django.conf.urls import patterns
+except ImportError:
+  pass
+import django
+from django.contrib import admin
+from {{ app }} import views
+
+
+urlpatterns = [
+{% for model in models %}
+url(r'^{{ model|lower }}/(?P<id>[0-9]+)$', views.{{ model }}APIView.as_view()),
+url(r'^{{ model|lower }}/$', views.{{ model }}APIListView.as_view()),
+{% endfor %}
+]
+"""
+
+
+API_VIEW = """from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from {{ app }}.serializers import {{ serializers|join:', ' }}
+from {{ app }}.models import {{ models|join:', ' }}
+{% for model in models %}
+
+class {{ model }}APIView(APIView):
+
+    def get(self, request, id):
+        try:
+            item = {{ model }}.objects.get(pk=id)
+            serializer = {{ model }}Serializer(item)
+            return Response(serializer.data)
+        except {{ model }}.DoesNotExist:
+            return Response(status=404)
+
+    def put(self, request, id):
+        try:
+            item = {{ model }}.objects.get(pk=id)
+        except {{ model }}.DoesNotExist:
+            return Response(status=404)
+        serializer = {{ model }}Serializer(item, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
+
+    def delete(self, request, id):
+        try:
+            item = {{ model }}.objects.get(pk=id)
+        except {{ model }}.DoesNotExist:
+            return Response(status=404)
+        item.delete()
+        return Response(status=204)
+
+
+class {{ model }}APIListView(APIView):
+
+    def get(self, request,):
+        items = {{ model }}.objects.all()
+        paginator = PageNumberPagination()
+        result_page = paginator.paginate_queryset(items, request)
+        serializer = {{ model }}Serializer(result_page, many=True)
+        return paginator.get_paginated_response(serializer.data)
+
+    def post(self, request):
+        serializer = {{ model }}Serializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
+{% endfor %}"""

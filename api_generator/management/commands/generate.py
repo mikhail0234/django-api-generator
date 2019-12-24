@@ -16,7 +16,11 @@ class Command(AppCommand):
                             action='store_true',
                             help='generate serializers only'),
 
+        parser.add_argument('--views', dest='views', action='store_true',
+                            help='generate views only'),
 
+        parser.add_argument('--urls', dest='urls', action='store_true',
+                            help='generate urls only'),
 
     def handle_app_config(self, app_config, **options):
         if app_config.models_module is None:
@@ -24,5 +28,7 @@ class Command(AppCommand):
 
         generator = BaseGenerator(app_config)
         result = generator.generate_serializers()
+        result += generator.generate_views()
+        result += generator.generate_urls()
 
         print(result)
