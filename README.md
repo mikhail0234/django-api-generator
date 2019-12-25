@@ -4,8 +4,7 @@
 
 # Установка 
 
-Скачать проект и настроить окружение
-    
+Скачать проект и настроить окружение и установить модуль
 
     $ git clone https://github.com/mikhail0234/django-api-generator
     $ cd drf-generators
@@ -14,7 +13,7 @@
     $ pip install requirements.txt
     $ python3 setup.py install
     
-Изменить settings.py 
+Изменить settings.py
 
 
     INSTALLED_APPS = (
@@ -37,7 +36,7 @@
 
 
     $ python3 manage.py generate api 
-где ``app`` это приложение для которого генерируется код
+где ``app`` это приложение, для которого генерируется код
 
 дополнительные команды:
   
@@ -48,10 +47,8 @@
   ``--urls``                 Герерация только Urls.
 
 
-
-
 **Пример 2:** Генерация только serializers.py 
 
-    $ python3 manage.py generate api --serializers f
+    $ python3 manage.py generate api --serializers
 
 -------------------
